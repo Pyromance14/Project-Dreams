@@ -1,35 +1,60 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerControl : MonoBehaviour {
 
-    
     public float moveSpeed;
-    public float jumpHieght;
+    public float jumpHeight;
 
-    public Vector2 velocity { get; private set; }
  
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-           GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jumpHieght);
-        }
+    public Transform groundCheck;
+    public float groundCheckRadious;
+    public LayerMask whatIsGround;
+    private bool grounded;
 
+    private Animator anim;
+ 
+	// Use this for initialization
+	void Start () {
+	
+        {
+            anim = GetComponent<Animator>();
+          
+        }
+	}
+
+
+    // Update is called once per frame
+    void Update () {
+        
+     
+		if(Input.GetKeyDown (KeyCode.J) && grounded)
+        {
+            GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jumpHeight);
+            anim.SetBool("Grounded", grounded);
+        }
+      
         if (Input.GetKey(KeyCode.D))
         {
             GetComponent<Rigidbody2D>().velocity = new Vector2(moveSpeed, GetComponent<Rigidbody2D>().velocity.y);
+            
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(-moveSpeed, 0);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(-moveSpeed, GetComponent<Rigidbody2D>().velocity.y);
+            
         }
+        grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadious, whatIsGround);
+        anim.SetFloat("Speed", Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x));
+
+        if (GetComponent<Rigidbody2D>().velocity.x > 0)
+            transform.localScale = new Vector3(1f, 1f, 1f);
+        else if (GetComponent<Rigidbody2D>().velocity.x < 0)
+            transform.localScale = new Vector3(-1f, 1f, 1f);
     }
+   
 }
+
